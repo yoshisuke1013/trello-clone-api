@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { List } from "./list.entity";
 
 @Entity()
 export class Card {
@@ -28,6 +30,9 @@ export class Card {
 
   @Column()
   listId!: number;
+
+  @ManyToOne(() => List, (list) => list.cards, { onDelete: "CASCADE" })
+  list!: List;
 
   @CreateDateColumn()
   readonly createdAt?: Date;

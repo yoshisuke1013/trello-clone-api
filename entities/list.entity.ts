@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Card } from "./card.entity";
 
 @Entity()
 export class List {
@@ -16,6 +18,9 @@ export class List {
 
   @Column()
   position!: number;
+
+  @OneToMany(() => Card, (card) => card.list, { cascade: true })
+  cards?: Card[];
 
   @CreateDateColumn()
   readonly createdAt?: Date;
