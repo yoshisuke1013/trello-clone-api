@@ -153,6 +153,27 @@ app.delete("/cards/:id", async (req, res) => {
   }
 });
 
+app.put("/cards", async (req, res) => {
+  try {
+    const { cards } = req.body;
+
+    const cardArray = Array.isArray(cards) ? cards : [cards];
+
+    for await (const card of cardArray) {
+      await cardRepository.save(card);
+    }
+
+    const updatedCard = await cardRepository.findBy({
+      id: In(cardArray.map((card) => card.id)),
+    });
+
+    res.status(200).json(updatedCard);
+  } catch (error) {
+    console.error("カード更新エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
 AppDataSource.initialize().then(() => {
   console.log("データベースに接続しました");
   app.listen(PORT, () => {
