@@ -22,7 +22,7 @@ app.get("/lists", async (req, res) => {
     const lists = await listRepository.find({
       order: { position: "ASC" },
     });
-    res.status(201).json(lists);
+    res.status(200).json(lists);
   } catch (error) {
     console.error("リスト取得エラー：", error);
     res.status(500).json({ message: "サーバーエラーが発生しました" });
@@ -89,6 +89,18 @@ app.put("/lists", async (req, res) => {
     res.status(200).json(updatedList);
   } catch (error) {
     console.error("リスト更新エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
+app.get("/cards", async (req, res) => {
+  try {
+    const cards = await cardRepository.find({
+      order: { position: "ASC" },
+    });
+    res.status(200).json(cards);
+  } catch (error) {
+    console.error("カード取得エラー：", error);
     res.status(500).json({ message: "サーバーエラーが発生しました" });
   }
 });
