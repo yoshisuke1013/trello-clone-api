@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { In } from "typeorm";
 import { AppDataSource } from "./datasource";
 import { List } from "./entities/list.entity";
 
@@ -65,6 +66,27 @@ app.delete("/lists/:id", async (req, res) => {
     res.status(200).json({ message: "リストを削除しました" });
   } catch (error) {
     console.error("リスト削除エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
+app.put("/lists", async (req, res) => {
+  try {
+    const { lists } = req.body;
+
+    const listArray = Array.isArray(lists) ? lists : [lists];
+
+    for await (const list of listArray) {
+      await listRepository.save(list);
+    }
+
+    const updatedList = await listRepository.findBy({
+      id: In(listArray.map((list) => list.id)),
+    });
+
+    res.status(200).json(updatedList);
+  } catch (error) {
+    console.error("リスト更新エラー：", error);
     res.status(500).json({ message: "サーバーエラーが発生しました" });
   }
 });
