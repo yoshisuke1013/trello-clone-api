@@ -14,6 +14,18 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
+app.get("/lists", async (req, res) => {
+  try {
+    const lists = await listRepository.find({
+      order: { position: "ASC" },
+    });
+    res.status(201).json(lists);
+  } catch (error) {
+    console.error("リスト取得エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
 app.post("/lists", async (req, res) => {
   try {
     const { title } = req.body;
