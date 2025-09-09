@@ -133,6 +133,26 @@ app.post("/cards", async (req, res) => {
   }
 });
 
+app.delete("/cards/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    const existingCard = await cardRepository.findOne({ where: { id } });
+
+    if (existingCard == null) {
+      res.status(404).json({ message: "カードが見つかりませんでした" });
+      return;
+    }
+
+    await cardRepository.delete(id);
+
+    res.status(200).json({ message: "カードを削除しました" });
+  } catch (error) {
+    console.error("リスト削除エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
 AppDataSource.initialize().then(() => {
   console.log("データベースに接続しました");
   app.listen(PORT, () => {
