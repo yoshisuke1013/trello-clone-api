@@ -3,8 +3,10 @@ import cors from "cors";
 import { In } from "typeorm";
 import { AppDataSource } from "./datasource";
 import { List } from "./entities/list.entity";
+import { Card } from "./entities/card.entity";
 
 const listRepository = AppDataSource.getRepository(List);
+const cardRepository = AppDataSource.getRepository(Card);
 
 const app = express();
 const PORT = 8888;
@@ -87,6 +89,34 @@ app.put("/lists", async (req, res) => {
     res.status(200).json(updatedList);
   } catch (error) {
     console.error("リスト更新エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
+app.post("/cards", async (req, res) => {
+  try {
+    const { title, listId } = req.body;
+
+    const maxPositionCardArray = await cardRepository.find({
+      where: { listId },
+      order: { position: "DESC" },
+      take: 1,
+    });
+
+    const maxPositionCard = maxPositionCardArray[0];
+
+    const nextPosition =
+      maxPositionCard != null ? maxPositionCard.position + 1 : 0;
+
+    const card = await cardRepository.save({
+      title,
+      listId,
+      position: nextPosition,
+    });
+
+    res.status(201).json(card);
+  } catch (error) {
+    console.error("カード作成エラー：", error);
     res.status(500).json({ message: "サーバーエラーが発生しました" });
   }
 });
