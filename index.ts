@@ -49,6 +49,26 @@ app.post("/lists", async (req, res) => {
   }
 });
 
+app.delete("/lists/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    const existingList = await listRepository.findOne({ where: { id } });
+
+    if (existingList == null) {
+      res.status(404).json({ message: "リストが見つかりませんでした" });
+      return;
+    }
+
+    await listRepository.delete(id);
+
+    res.status(200).json({ message: "リストを削除しました" });
+  } catch (error) {
+    console.error("リスト削除エラー：", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました" });
+  }
+});
+
 AppDataSource.initialize().then(() => {
   console.log("データベースに接続しました");
   app.listen(PORT, () => {
